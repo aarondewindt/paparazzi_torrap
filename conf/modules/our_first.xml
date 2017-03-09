@@ -1,0 +1,16 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="our_first">
+  <doc>
+    <description>Our first module</description>
+  </doc>
+  <header>
+    <file name="our_first.h"/>
+  </header>
+  <init fun="first_init()"/>
+  <periodic fun="first_periodic()" freq="1"/>
+  <makefile>
+    <file name="our_first.c"/>
+  </makefile>
+</module>
+

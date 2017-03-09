@@ -108,6 +108,12 @@
       <stay wp="GOAL"/>
       <exception cond="!InsideObstacleZone(WaypointX(WP_TRAJECTORY),WaypointY(WP_TRAJECTORY))" deroute="PrepareObstacleRun"/>
     </block>
+    
+    <block name="first">
+        <stay wp="GOAL"/>
+    	<exception cond="spentLongTimeInBlock(block_time)" deroute="Standby"/>
+    </block>
+    
     <block name="PrepareObstacleRun">
       <while cond="!InsideObstacleZone(WaypointX(WP_TRAJECTORY),WaypointY(WP_TRAJECTORY))">
         <call_once fun="increase_nav_heading(&nav_heading, 5)"/>
