@@ -47,7 +47,9 @@
 			<define name="FILE_LOGGER_PATH" value="/data/ftp/internal_000" />
 		</module>
 		<!-- Video/Camera modules -->
-		<module name="video_thread" />
+		<module name="video_thread">
+			<define name="VIDEO_THREAD_CAMERA" value="front_camera" />		
+		</module>
 		<module name="cv_ae_awb">
 			<define name="CV_AE_AWB_AV" value="1" />
 			<define name="CV_AE_AWB_VERBOSE" value="0" />
@@ -65,7 +67,6 @@
 			<define name="VIEWVIDEO_WRITE_VIDEO" value="FALSE" />
 			<define name="VIEWVIDEO_VIDEO_FILE" value="orangeAvoider" />
 			<define name="VIEWVIDEO_STREAM_VIDEO" value="TRUE" />
-			<define name="VIDEO_THREAD_CAMERA" value="front_camera" />
 		</module>
 	</modules>
 
