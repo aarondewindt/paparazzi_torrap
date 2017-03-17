@@ -39,7 +39,7 @@
 			<define name="GUIDANCE_INDI_RC_DEBUG" value="TRUE"/> </module> -->
 	</firmware>
 	<modules main_freq="512">
-	    <module name="our_first"/>
+	    	<module name="our_first"/>
 		<module name="geo_mag" />
 		<module name="air_data" />
 		<module name="send_imu_mag_current" />
@@ -65,6 +65,7 @@
 			<define name="VIEWVIDEO_WRITE_VIDEO" value="FALSE" />
 			<define name="VIEWVIDEO_VIDEO_FILE" value="orangeAvoider" />
 			<define name="VIEWVIDEO_STREAM_VIDEO" value="TRUE" />
+			<define name="VIDEO_THREAD_CAMERA" value="front_camera" />
 		</module>
 	</modules>
 
