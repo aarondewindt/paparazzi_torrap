@@ -47,9 +47,7 @@
 			<define name="FILE_LOGGER_PATH" value="/data/ftp/internal_000" />
 		</module>
 		<!-- Video/Camera modules -->
-		<module name="video_thread">
-			<define name="VIDEO_THREAD_CAMERA" value="front_camera" />		
-		</module>
+		<module name="video_thread" />
 		<module name="cv_ae_awb">
 			<define name="CV_AE_AWB_AV" value="1" />
 			<define name="CV_AE_AWB_VERBOSE" value="0" />
@@ -59,7 +57,7 @@
 		</module>
 		<module name="orange_avoider" />
 		<module name="video_rtp_stream">
-			<configure name="VIEWVIDEO_HOST" value="192.168.42.65" />
+			<configure name="VIEWVIDEO_HOST" value="192.168.42.27" />
 			<configure name="VIEWVIDEO_BROADCAST" value="FALSE" />
 			<define name="VIEWVIDEO_CAMERA" value="front_camera" />
 			<define name="VIEWVIDEO_SHOT_PATH" value="/data/ftp/internal_000" />
