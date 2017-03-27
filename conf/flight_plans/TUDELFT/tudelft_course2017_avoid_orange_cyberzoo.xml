@@ -100,10 +100,14 @@
       <call_once fun="NavSetWaypointHere(WP_STDBY)"/>
       <stay wp="STDBY"/>
     </block>
+    
+    <!-- Orange avoider blocks
     <block key="g" name="START" strip_button="Go" strip_icon="lookfore.png">
       <call_once fun="NavSetWaypointHere(WP_GOAL)"/>
       <set var="trajectoryConfidence" value="1"/>
     </block>
+    
+    
     <block name="StayGoal">
       <stay wp="GOAL"/>
       <exception cond="!InsideObstacleZone(WaypointX(WP_TRAJECTORY),WaypointY(WP_TRAJECTORY))" deroute="PrepareObstacleRun"/>
@@ -114,18 +118,20 @@
     	<exception cond="spentLongTimeInBlock(block_time)" deroute="Standby"/>
     </block>
     
+    
     <block name="PrepareObstacleRun">
       <while cond="!InsideObstacleZone(WaypointX(WP_TRAJECTORY),WaypointY(WP_TRAJECTORY))">
         <call_once fun="increase_nav_heading(&nav_heading, 5)"/>
       </while>
     </block>
-    <block name="GetIntoObstacleZone">
+    block name="GetIntoObstacleZone">
       <while cond="!InsideObstacleZone(GetPosX(),GetPosY())">
         <call_once fun="moveWaypointForward(WP_GOAL, 0.1)"/>
         <go wp="GOAL"/>
       </while>
       <deroute block="START"/>
-    </block>
+    </block>-->
+    
     <block key="l" name="Land here" strip_button="Land Here" strip_icon="land-right.png">
       <call_once fun="NavSetWaypointHere(WP_TD)"/>
       <go wp="TD"/>

@@ -1,0 +1,55 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="torrap">
+  <doc>
+    <description>Module for the mavlab competition.</description>
+  </doc>
+  
+  <settings>
+    <dl_settings>
+      <dl_settings NAME="TDD">
+        <dl_setting var="listener->active" min="0" step="1" max="1" shortname="active" />
+         
+		<dl_setting var="orange_filter.y_m" min="0" step="1" max="255" shortname="O.y_min"/>
+		<dl_setting var="orange_filter.y_M" min="0" step="1" max="255" shortname="O.y_max"/>
+		<dl_setting var="orange_filter.u_m" min="0" step="1" max="255" shortname="O.u_min"/>
+		<dl_setting var="orange_filter.u_M" min="0" step="1" max="255" shortname="O.u_max"/>
+		<dl_setting var="orange_filter.v_m" min="0" step="1" max="255" shortname="O.v_min"/>
+		<dl_setting var="orange_filter.v_M" min="0" step="1" max="255" shortname="O.v_max"/>
+		
+		<dl_setting var="green_filter.y_m" min="0" step="1" max="255" shortname="G.y_min"/>
+		<dl_setting var="green_filter.y_M" min="0" step="1" max="255" shortname="G.y_max"/>
+		<dl_setting var="green_filter.u_m" min="0" step="1" max="255" shortname="G.u_min"/>
+		<dl_setting var="green_filter.u_M" min="0" step="1" max="255" shortname="G.u_max"/>
+		<dl_setting var="green_filter.v_m" min="0" step="1" max="255" shortname="G.v_min"/>
+		<dl_setting var="green_filter.v_M" min="0" step="1" max="255" shortname="G.v_max"/>
+		
+		<dl_setting var="black_filter.y_m" min="0" step="1" max="255" shortname="K.y_min"/>
+		<dl_setting var="black_filter.y_M" min="0" step="1" max="255" shortname="K.y_max"/>
+		<dl_setting var="black_filter.u_m" min="0" step="1" max="255" shortname="K.u_min"/>
+		<dl_setting var="black_filter.u_M" min="0" step="1" max="255" shortname="K.u_max"/>
+		<dl_setting var="black_filter.v_m" min="0" step="1" max="255" shortname="K.v_min"/>
+		<dl_setting var="black_filter.v_M" min="0" step="1" max="255" shortname="K.v_max"/>
+		
+		<dl_setting var="blue_filter.y_m" min="0" step="1" max="255" shortname="B.y_min"/>
+		<dl_setting var="blue_filter.y_M" min="0" step="1" max="255" shortname="B.y_max"/>
+		<dl_setting var="blue_filter.u_m" min="0" step="1" max="255" shortname="B.u_min"/>
+		<dl_setting var="blue_filter.u_M" min="0" step="1" max="255" shortname="B.u_max"/>
+		<dl_setting var="blue_filter.v_m" min="0" step="1" max="255" shortname="B.v_min"/>
+		<dl_setting var="blue_filter.v_M" min="0" step="1" max="255" shortname="B.v_max"/>
+      </dl_settings>
+    </dl_settings>
+  </settings>
+  
+  <header>
+    <file name="torrap.h"/>
+    <file name="torrap_direction_detection.h"/>
+  </header>
+  <init fun="torrap_init()"/>
+  <periodic fun="torrap_periodic()" freq="1" start="torrap_start()" stop="torrap_stop()" autorun="TRUE"/>
+  <makefile>
+    <file name="torrap.c"/>
+    <file name="torrap_direction_detection.c"/>
+  </makefile>
+</module>
+
