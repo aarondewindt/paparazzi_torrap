@@ -41,7 +41,6 @@
 	</firmware>
 	<modules main_freq="512">
 	    <!-- <module name="our_first"/>-->
-	    
 		<module name="geo_mag" />
 		<module name="air_data" />
 		<module name="send_imu_mag_current" />
