@@ -10,8 +10,8 @@
 #include "modules/torrap/torrap_direction_detection.h"
 
 #define GAIN_SCALE 1.
-#define N_SECTIONS 16
-#define SECTION_SPREAD 3.3
+#define N_SECTIONS 20
+#define SECTION_SPREAD 3.8
 
 #define sign(x) (x < 0 ? -1 : 1)
 

@@ -33,14 +33,14 @@
 
 struct video_listener *listener = NULL;
 
-int8_t direction = 0;
-int8_t turn_dir = 0;
+int8_t direction = 1;
+int8_t turn_dir = 1;
 int8_t turn = 0;
 int8_t torrap_active = 0;
 
-float yaw_degrees_per_period = 5.0;
+float yaw_degrees_per_period = 10.0;
 uint16_t trajectory_confidence   = 1;
-float max_distance = 2.25;
+float max_distance = 1.35;
 
 
 void torrap_init() {
@@ -76,9 +76,9 @@ void torrap_periodic() {
 				  if (turn_dir == 0) {
 					  turn_dir = direction;
 				  }
-				  float move_distance = 0.5;
-				  moveWaypointForward(WP_GOAL, move_distance);
-				  moveWaypointForward(WP_TRAJECTORY, 1.25 * move_distance);
+				  float move_distance = 0.05;
+				  waypoint_set_here_2d(WP_GOAL);
+				  waypoint_set_here_2d(WP_TRAJECTORY);
 				  increase_nav_heading(&nav_heading, turn_dir * yaw_degrees_per_period);
 				  if(trajectory_confidence > 5){
 					  trajectory_confidence -= 4;
@@ -109,6 +109,29 @@ uint8_t increase_nav_heading(int32_t *heading, float incrementDegrees)
 //  printf("Increasing heading to %f\n", ANGLE_FLOAT_OF_BFP(*heading) * 180 / M_PI);
   return false;
 }
+
+
+int32_t border_target_heading = 0;
+uint8_t border_turn(int32_t *heading, float incrementDegrees) {
+	struct Int32Eulers *eulerAngles   = stateGetNedToBodyEulers_i();
+	int32_t newHeading = eulerAngles->psi + ANGLE_BFP_OF_REAL( incrementDegrees / 180.0 * M_PI);
+	// Check if your turn made it go out of bounds...
+	INT32_ANGLE_NORMALIZE(newHeading); // HEADING HAS INT32_ANGLE_FRAC....
+//	*heading = newHeading;
+	border_target_heading = newHeading;
+	//  printf("Increasing heading to %f\n", ANGLE_FLOAT_OF_BFP(*heading) * 180 / M_PI);
+	return false;
+}
+
+uint8_t border_turn_target_heading_reached() {
+	struct Int32Eulers *eulerAngles   = stateGetNedToBodyEulers_i();
+	if (abs(eulerAngles->psi - border_target_heading) < ANGLE_BFP_OF_REAL( 10 / 180.0 * M_PI)) {
+		return true;
+	}else {
+		return false;
+	}
+}
+
 
 /*
  * Calculates coordinates of a distance of 'distanceMeters' forward w.r.t. current position and heading
@@ -147,6 +170,8 @@ uint8_t moveWaypointForward(uint8_t waypoint, float distanceMeters)
   moveWaypoint(waypoint, &new_coor);
   return false;
 }
+
+
 
 ///*
 // * Sets the variable 'incrementForAvoidance' randomly positive/negative

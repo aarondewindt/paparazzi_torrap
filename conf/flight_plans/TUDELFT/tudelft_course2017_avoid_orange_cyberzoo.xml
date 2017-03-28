@@ -122,10 +122,22 @@
     </block>-->
     
     
-    <block name="PrepareObstacleRun">
+    <!-- <block name="PrepareObstacleRun">
       <set var="torrap_active" value="0"/>
+      <set var="turn_dir" value="direction"/>
       <while cond="!InsideObstacleZone(WaypointX(WP_TRAJECTORY),WaypointY(WP_TRAJECTORY)) || turn">
-        <call_once fun="increase_nav_heading(&nav_heading, 5)"/>
+        <call_once fun="increase_nav_heading(&nav_heading, turn_dir * 5.)"/>
+      </while>
+    </block>-->
+    
+    <block name="PrepareObstacleRun"> 
+      <set var="torrap_active" value="0"/>
+      <set var="turn_dir" value="direction"/>
+      <while cond="!InsideObstacleZone(WaypointX(WP_TRAJECTORY),WaypointY(WP_TRAJECTORY)) || turn">
+	      <call_once fun="border_turn(&nav_heading, turn_dir * 55)"/> 
+	      <while cond="!border_turn_target_heading_reached()"> 
+	      	<call_once fun="increase_nav_heading(&nav_heading, turn_dir * yaw_degrees_per_period)"/>       
+	      </while>
       </while>
     </block>
     

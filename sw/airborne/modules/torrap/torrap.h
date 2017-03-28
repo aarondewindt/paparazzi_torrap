@@ -32,6 +32,9 @@
 
 extern int8_t turn;
 extern int8_t torrap_active;
+extern int8_t direction;
+extern int8_t turn_dir;
+extern float max_distance;
 
 extern struct video_listener *listener;
 extern float yaw_degrees_per_period;
@@ -42,6 +45,9 @@ extern struct image_t *torrap_image_handler(struct image_t *img);
 extern void torrap_start();
 extern void torrap_stop();
 extern void torrap_periodic();
+
+uint8_t border_turn(int32_t *heading, float incrementDegrees);
+uint8_t border_turn_target_heading_reached();
 
 extern uint8_t moveWaypointForward(uint8_t, float);
 extern uint8_t moveWaypoint(uint8_t, struct EnuCoor_i *);
