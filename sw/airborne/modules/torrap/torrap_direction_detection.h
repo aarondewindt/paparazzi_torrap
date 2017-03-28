@@ -27,6 +27,7 @@ struct ColorFilter {
     float y_end;
     float threshold;
     float gain;
+    float turn_gain;
 };
 
 struct ImageSection {
@@ -34,12 +35,14 @@ struct ImageSection {
     uint16_t end;
     uint32_t size;
     float score;
+    float turn_score;
     float gain;
 };
 
 struct TorrapDirectionResult {
     int8_t direction;
     int8_t panic;
+    int8_t turn;
     struct image_t * img;
 };
 
@@ -47,6 +50,7 @@ extern struct ColorFilter orange_filter;
 extern struct ColorFilter green_filter;
 extern struct ColorFilter black_filter;
 extern struct ColorFilter blue_filter;
+extern float turn_threshold;
 
 
 struct TorrapDirectionResult* torrap_direction_detection(struct image_t *img);

@@ -87,52 +87,59 @@
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
     <block key="r" name="Start Engine">
+      <set var="torrap_active" value="0"/>
       <call_once fun="NavResurrect()"/>
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
       <call_once fun="NavResurrect()"/>
     </block>
     <block key="t" name="Takeoff" strip_button="Takeoff" strip_icon="takeoff.png">
+      <set var="torrap_active" value="0"/>
       <exception cond="GetPosAlt() > 1.0" deroute="Standby"/>
       <call_once fun="NavSetWaypointHere(WP_CLIMB)"/>
       <stay climb="nav_climb_vspeed" vmode="climb" wp="CLIMB"/>
     </block>
     <block key="s" name="Standby" strip_button="Standby" strip_icon="home.png">
+      <set var="torrap_active" value="0"/>
       <call_once fun="NavSetWaypointHere(WP_STDBY)"/>
       <stay wp="STDBY"/>
     </block>
     
-    <!-- Orange avoider blocks
     <block key="g" name="START" strip_button="Go" strip_icon="lookfore.png">
+      <set var="torrap_active" value="1"/>
       <call_once fun="NavSetWaypointHere(WP_GOAL)"/>
-      <set var="trajectoryConfidence" value="1"/>
-    </block>
-    
+      <set var="trajectory_confidence" value="1"/>
+    </block> 
     
     <block name="StayGoal">
+      <set var="torrap_active" value="1"/>
       <stay wp="GOAL"/>
       <exception cond="!InsideObstacleZone(WaypointX(WP_TRAJECTORY),WaypointY(WP_TRAJECTORY))" deroute="PrepareObstacleRun"/>
     </block>
     
-    <block name="first">
+    <!-- <block name="first">
         <stay wp="GOAL"/>
     	<exception cond="spentLongTimeInBlock(block_time)" deroute="Standby"/>
-    </block>
+    </block>-->
     
     
     <block name="PrepareObstacleRun">
-      <while cond="!InsideObstacleZone(WaypointX(WP_TRAJECTORY),WaypointY(WP_TRAJECTORY))">
+      <set var="torrap_active" value="0"/>
+      <while cond="!InsideObstacleZone(WaypointX(WP_TRAJECTORY),WaypointY(WP_TRAJECTORY)) || turn">
         <call_once fun="increase_nav_heading(&nav_heading, 5)"/>
       </while>
     </block>
-    block name="GetIntoObstacleZone">
+    
+    <block name="GetIntoObstacleZone">
+      <set var="torrap_active" value="0"/>
       <while cond="!InsideObstacleZone(GetPosX(),GetPosY())">
         <call_once fun="moveWaypointForward(WP_GOAL, 0.1)"/>
         <go wp="GOAL"/>
       </while>
       <deroute block="START"/>
-    </block>-->
+    </block>
     
     <block key="l" name="Land here" strip_button="Land Here" strip_icon="land-right.png">
+    <set var="torrap_active" value="0"/>
       <call_once fun="NavSetWaypointHere(WP_TD)"/>
       <go wp="TD"/>
       <deroute block="Flare"/>

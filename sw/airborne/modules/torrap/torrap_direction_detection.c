@@ -10,13 +10,14 @@
 #include "modules/torrap/torrap_direction_detection.h"
 
 #define GAIN_SCALE 1.
-#define N_SECTIONS 8
+#define N_SECTIONS 16
+#define SECTION_SPREAD 3.3
 
 #define sign(x) (x < 0 ? -1 : 1)
 
 struct ImageSection *sections = NULL;
 struct TorrapDirectionResult result;
-
+float turn_threshold = 0.85;
 
 uint8_t *working_buffer = NULL;
 
@@ -32,37 +33,40 @@ struct ColorFilter orange_filter = {
         .v_m = 167,
         .v_M = 255,
         .y_start = 0,
-        .y_end = 0.5,
+        .y_end = 1.,
         .threshold = 0,
         .gain = -1,
+		.turn_gain = 1
 };
 
 
 struct ColorFilter green_filter = {
         .y_m = 20,
-        .y_M = 255,
+        .y_M = 80,
         .u_m = 0,
-        .u_M = 128,
+        .u_M = 114,
         .v_m = 0,
-        .v_M = 128,
+        .v_M = 145,
         .y_start = 0,
-        .y_end = 0.5,
+        .y_end = 1.,
         .threshold = 0,
         .gain = 2,
+		.turn_gain = 0
 };
 
 
 struct ColorFilter black_filter = {
         .y_m = 0,
-        .y_M = 40,
-        .u_m = 0,
-        .u_M = 255,
-        .v_m = 0,
-        .v_M = 255,
+        .y_M = 60,
+        .u_m = 120,
+        .u_M = 135,
+        .v_m = 110,
+        .v_M = 135,
         .y_start = 0.,
-        .y_end = 0.5,
+        .y_end = 1.,
         .threshold = 0.,
         .gain = -1,
+		.turn_gain = 1
 };
 
 struct ColorFilter blue_filter = {
@@ -73,9 +77,10 @@ struct ColorFilter blue_filter = {
         .v_m = 0,
         .v_M = 124,
         .y_start = 0,
-        .y_end = 0.5,
+        .y_end = 1.,
         .threshold = 0.,
         .gain = -1,
+		.turn_gain = 1
 };
 
 
@@ -89,18 +94,10 @@ struct TorrapDirectionResult* torrap_direction_detection(struct image_t *img)
     // Reset section scores to 0.
     reset_sections();
 
-    // Update the section scores based on the color filters.
-    color_section_score_update(img, &black_filter);
-//    configure_output_image(img);
-
-    color_section_score_update(img, &orange_filter);
-//    configure_output_image(img);
-
     color_section_score_update(img, &green_filter);
-//    configure_output_image(img);
-
+    color_section_score_update(img, &black_filter);
+    color_section_score_update(img, &orange_filter);
     color_section_score_update(img, &blue_filter);
-//    configure_output_image(img);
 
     // Calculate the direction in which to go.
     result.direction = sign(calc_direction());
@@ -116,10 +113,20 @@ void print_status() {
 		return;
 	}
 
-    printf("Direction: %d\nScore    : ", result.direction);
+    printf("Direction: %d\nTurn     : %d\nScore    : ", result.direction, result.turn);
     for (int i = 0; i < N_SECTIONS; i++) {
         printf("%f ", sections[i].score);
     }
+
+    printf("\nTurn Score: ");
+    for (int i = 0; i < N_SECTIONS; i++) {
+	    printf("%f ", sections[i].turn_score);
+    }
+
+    printf("\nSize: ");
+	for (int i = 0; i < N_SECTIONS; i++) {
+		printf("%d ", sections[i].size);
+	}
 
     printf("\nGain     : ");
     for (int i = 0; i < N_SECTIONS; i++) {
@@ -138,22 +145,33 @@ void configure_output_image(struct image_t *img) {
 
 }
 
+uint16_t torrap_section_location(uint16_t image_width, uint16_t i) {
+	float q = ((float)(fabs(i - (N_SECTIONS / 2.)))) / ((float)(N_SECTIONS / 2));
+	uint32_t section_location = (1 + (i < (N_SECTIONS / 2) ? -1 : 1) * pow(q, SECTION_SPREAD)) * image_width / 2 ;
+
+	printf("location %d\n", section_location);
+
+	return section_location;
+}
+
 void torrap_init_sections(struct image_t *img){
     output_buffer = malloc(img->w * img->h);
     working_buffer = malloc(img->w * img->h);
 
-    // Sections initialization
-    uint16_t width = img->h / N_SECTIONS;
+
     // Allocate memory for the sections definitions. Loop through each section and set their size.
     sections = (struct ImageSection*)malloc(sizeof(struct ImageSection) * N_SECTIONS);
     for (uint16_t i = 0; i < N_SECTIONS; i ++){
-        // Calculate the location of the section
-        uint16_t center = i * width + width / 2;
-        sections[i].start = i * width;
-        sections[i].end = i * width + width;
-        sections[i].size = width * img->w;
+    	// Sections initialization
+//    	uint16_t width = torrap_section_width(img->h, i);
+
+        sections[i].start = torrap_section_location(img->h, i);
+        sections[i].end = torrap_section_location(img->h, i+1);
+        sections[i].size = (sections[i].end - sections[i].start) * img->w;
 
         // Calculate the gains for each section.
+
+        uint16_t center = (sections[i].end + sections[i].start) / 2;
         sections[i].gain = calc_gain(img->h, center);
     }
 
@@ -168,6 +186,8 @@ void torrap_init_sections(struct image_t *img){
     for (int i = 0; i < N_SECTIONS; i++) {
         sections[i].gain /= gain_sum;
     }
+
+    print_status();
 }
 
 float calc_gain(uint16_t width, uint16_t loc) {
@@ -181,6 +201,9 @@ float calc_direction() {
     // Get the sum of the scores
     float score_sum = 0;
     for (int i = 0; i < N_SECTIONS; i++) {
+    	if (sections[i].turn_score > turn_threshold) {
+    		result.turn = 1;
+    	}
         score_sum += fabs(sections[i].score);
     }
 
@@ -210,7 +233,10 @@ void reset_sections() {
     // Reset all section scores to 0.
     for (uint16_t i = 0; i < N_SECTIONS; ++i) {
         sections[i].score = 0;
+        sections[i].turn_score = 0;
     }
+
+    result.turn = 0;
 }
 
 
@@ -253,7 +279,8 @@ void color_section_score_update(struct image_t *img,
 
         // Only add to the score if the minimum threshold is satisfied.
         if (count >= (size * filter_info->threshold)) {
-            sections[i].score += (float)count / size * filter_info->gain;
+            sections[i].score += (float)count * filter_info->gain;  // / size
+            sections[i].turn_score += (float)count / size * filter_info->turn_gain;
         }
     }
 }
@@ -279,35 +306,40 @@ uint16_t torrap_yuv422_colorfilt(struct image_t *input,
 
         for (uint16_t x = (uint16_t )(input->w * filter_info->y_start);
         		x < (uint16_t)(input->w * filter_info->y_end); x += 2) {
-            // Check if the color is inside the specified values
-            if (
-                    (source[1] >= filter_info->y_m)
-                    && (source[1] <= filter_info->y_M)
-                    && (source[0] >= filter_info->u_m)
-                    && (source[0] <= filter_info->u_M)
-                    && (source[2] >= filter_info->v_m)
-                    && (source[2] <= filter_info->v_M)
-                    ) {
 
-                cnt ++;
-                dest[0] = 255;
-                dest[1] = 255;
-                // If it's black, make it white. Otherwise the detected color.
-                if (filter_info->y_m == 0) {
-                	source[0] = 255;
-                	source[1] = 255;
-                	source[2] = 255;
-                	source[3] = 255;
-                } else{
-                	source[0] = filter_info->u_m < 127 ? filter_info->u_m : filter_info->u_M;
-                	source[2] = filter_info->v_m < 127 ? filter_info->v_m : filter_info->v_M;
-                }
+        	if (source[1] != 255) {
+				// Check if the color is inside the specified values
+				if (
+						(source[1] >= filter_info->y_m)
+						&& (source[1] <= filter_info->y_M)
+						&& (source[0] >= filter_info->u_m)
+						&& (source[0] <= filter_info->u_M)
+						&& (source[2] >= filter_info->v_m)
+						&& (source[2] <= filter_info->v_M)
+						) {
+
+					cnt ++;
+					dest[0] = 255;
+					dest[1] = 255;
+					// If it's black, make it pink. Otherwise the detected color.
+					if (filter_info->y_m == 0) {
+						source[0] = 255;
+						source[1] = 255;
+						source[2] = 255;
+						source[3] = 255;
+					} else{
+						source[0] = filter_info->u_m < 127 ? filter_info->u_m : filter_info->u_M;
+						source[1] = 255;
+						source[2] = filter_info->v_m < 127 ? filter_info->v_m : filter_info->v_M;
+						source[3] = 255;
+					}
 
 
-            } else {
-                dest[0] = source[1];
-                dest[1] = source[3];
-            }
+				} else {
+					dest[0] = source[1];
+					dest[1] = source[3];
+				}
+        	}
 
 //            source[0] = 127;
 //            source[2] = 127;

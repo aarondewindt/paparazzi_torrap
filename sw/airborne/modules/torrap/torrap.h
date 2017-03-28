@@ -27,14 +27,26 @@
 #define TORRAP_H
 
 #include "modules/computer_vision/cv.h"
+#include <inttypes.h>
+#include "state.h"
+
+extern int8_t turn;
+extern int8_t torrap_active;
 
 extern struct video_listener *listener;
+extern float yaw_degrees_per_period;
+extern uint16_t trajectory_confidence;
 
 extern void torrap_init();
 extern struct image_t *torrap_image_handler(struct image_t *img);
 extern void torrap_start();
 extern void torrap_stop();
 extern void torrap_periodic();
+
+extern uint8_t moveWaypointForward(uint8_t, float);
+extern uint8_t moveWaypoint(uint8_t, struct EnuCoor_i *);
+extern uint8_t increase_nav_heading(int32_t *, float);
+extern uint8_t chooseRandomIncrementAvoidance(void);
 
 #endif
 
